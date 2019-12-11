@@ -1,26 +1,42 @@
 import React from 'react';
-import logo from './logo.svg';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import Navigation from './components/navigation/Navigation';
+import Home from './components/home/Home';
+import Products from './components/products/Products';
+import ProductPage from './components/products/ProductPage';
+import FAQ from './components/FAQ/FAQ';
+import Cart from './components/cart/Cart';
 import './App.css';
 
-function App() {
+import products from './utils/products';
+
+import { Provider } from 'react-redux';
+import store from './store';
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Navigation />
+        <Switch>
+          <Route exact path='/' component={Home} />
+          <Route path='/products' component={Products} />
+          <Route path='/faq' component={FAQ} />
+          <Route path='/cart' component={Cart} />
+
+          {products.map(({ title, route, price, image }) => (
+            <Route
+              key={title}
+              path={`/${route}`}
+              render={() => (
+                <ProductPage image={image} title={title} price={price} />
+              )}
+            />
+          ))}
+        </Switch>
+      </BrowserRouter>
+    </Provider>
   );
-}
+};
 
 export default App;
