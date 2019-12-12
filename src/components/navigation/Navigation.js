@@ -5,6 +5,11 @@ import { connect } from 'react-redux';
 import './Navigation.css';
 
 const Navigation = ({ cart }) => {
+  const calculateTotalItems = () =>
+    cart.reduce((current, { quantity }) => {
+      return quantity + current;
+    }, 0);
+
   return (
     <nav className='navigation'>
       <ul className='routes'>
@@ -26,7 +31,10 @@ const Navigation = ({ cart }) => {
           </li>
           <li>
             <Link className='route' to='/cart'>
-              Cart <span style={{ color: 'green' }}>{cart.length || ''}</span>
+              Cart{' '}
+              <span style={{ color: 'green' }}>
+                {cart.length ? calculateTotalItems() : ''}
+              </span>
             </Link>
           </li>
         </div>

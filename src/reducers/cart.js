@@ -1,20 +1,52 @@
-import { ADD_TO_CART, REMOVE_FROM_CART } from '../actions/types';
+import {
+  SETUP_CART,
+  ADD_TO_CART,
+  REMOVE_FROM_CART,
+  CHANGE_QUANTITY,
+  UPDATE_LOCAL_STORAGE
+} from '../actions/types';
 
 const initialState = [];
 
 export default function(state = initialState, action) {
   const { type, payload } = action;
+
   switch (type) {
+    case SETUP_CART:
+      return [...payload];
     case ADD_TO_CART:
-      for (let i = 0; i < state.length; i++) {
-        if (state[i].title === payload.title) {
-          const quantity = state[i].quantity + 1;
-          return [...state, { ...payload, quantity }];
-        }
+      if (state.find(product => product.title === payload.title)) {
+        return state.map(product => {
+          if (product.title !== payload.title) {
+            return product;
+          }
+
+          const quantity = product.quantity + payload.quantity;
+          const price = product.price;
+          return { ...payload, quantity, total: price * quantity };
+        });
       }
       return [...state, payload];
+    case CHANGE_QUANTITY:
+      return state.map(product => {
+        if (product.title !== payload.title) {
+          return product;
+        }
+        const quantity = payload.quantity;
+        const price = product.price;
+
+        return { ...product, quantity, total: price * quantity };
+      });
     case REMOVE_FROM_CART:
       return state.filter(item => item.title !== payload.title);
+    case UPDATE_LOCAL_STORAGE:
+      if (!state.length) {
+        localStorage.removeItem('audioCart');
+      } else {
+        const string = JSON.stringify(state);
+        localStorage.setItem('audioCart', string);
+      }
+      return state;
     default:
       return state;
   }

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { connect } from 'react-redux';
 import Navigation from './components/navigation/Navigation';
 import Home from './components/home/Home';
 import Products from './components/products/Products';
@@ -9,34 +10,37 @@ import Cart from './components/cart/Cart';
 import './App.css';
 
 import products from './utils/products';
+import { setupCart } from './actions/cart';
 
-import { Provider } from 'react-redux';
-import store from './store';
+const App = ({ setupCart }) => {
+  useEffect(() => {
+    if (localStorage.audioCart) {
+      const cart = JSON.parse(localStorage.audioCart);
+      setupCart(cart);
+    }
+  });
 
-const App = () => {
   return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <Navigation />
-        <Switch>
-          <Route exact path='/' component={Home} />
-          <Route path='/products' component={Products} />
-          <Route path='/faq' component={FAQ} />
-          <Route path='/cart' component={Cart} />
+    <BrowserRouter>
+      <Navigation />
+      <Switch>
+        <Route exact path='/' component={Home} />
+        <Route path='/products' component={Products} />
+        <Route path='/faq' component={FAQ} />
+        <Route path='/cart' component={Cart} />
 
-          {products.map(({ title, route, price, image }) => (
-            <Route
-              key={title}
-              path={`/${route}`}
-              render={() => (
-                <ProductPage image={image} title={title} price={price} />
-              )}
-            />
-          ))}
-        </Switch>
-      </BrowserRouter>
-    </Provider>
+        {products.map(({ title, route, price, image }) => (
+          <Route
+            key={title}
+            path={`/${route}`}
+            render={() => (
+              <ProductPage image={image} title={title} price={price} />
+            )}
+          />
+        ))}
+      </Switch>
+    </BrowserRouter>
   );
 };
 
-export default App;
+export default connect(null, { setupCart })(App);
